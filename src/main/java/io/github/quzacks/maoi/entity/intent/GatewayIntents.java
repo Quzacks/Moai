@@ -1,4 +1,4 @@
-package io.github.quzacks.maoi.gateway;
+package io.github.quzacks.maoi.entity.intent;
 
 /**
  * Enumerates all available gateway intents for Discord.

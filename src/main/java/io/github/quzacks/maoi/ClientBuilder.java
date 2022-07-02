@@ -1,7 +1,7 @@
 package io.github.quzacks.maoi;
 
-import io.github.quzacks.maoi.gateway.GatewayIntents;
-import io.github.quzacks.maoi.models.ClientPresence;
+import io.github.quzacks.maoi.entity.intent.GatewayIntents;
+import io.github.quzacks.maoi.entity.user.UserPresence;
 
 /**
  * Used to build a {@link DiscordClient} instance.
@@ -20,7 +20,7 @@ public class ClientBuilder {
     /**
      * Client presence.
      */
-    private ClientPresence presence;
+    private UserPresence presence;
 
     /**
      * Constructor for builder. Not supposed to be used outside class.
@@ -55,10 +55,10 @@ public class ClientBuilder {
     /**
      * Sets the client's presence data. This is not mandatory.
      *
-     * @param presence Instance of {@link ClientPresence}.
+     * @param presence Instance of {@link UserPresence}.
      * @return {@link ClientBuilder}
      */
-    public ClientBuilder setPresence(final ClientPresence presence) {
+    public ClientBuilder setPresence(final UserPresence presence) {
         this.presence = presence;
         return this;
     }

@@ -1,8 +1,8 @@
 package io.github.quzacks.maoi;
 
-import io.github.quzacks.maoi.gateway.GatewayIntents;
-import io.github.quzacks.maoi.gateway.websocket.DiscordWebSocket;
-import io.github.quzacks.maoi.models.ClientPresence;
+import io.github.quzacks.maoi.entity.intent.GatewayIntents;
+import io.github.quzacks.maoi.gateway.DiscordWebSocket;
+import io.github.quzacks.maoi.entity.user.UserPresence;
 
 /**
  * Information about the Discord client.
@@ -21,7 +21,7 @@ public class DiscordClient {
     /**
      * Presence data.
      */
-    private final ClientPresence presence;
+    private final UserPresence presence;
 
     /**
      * Constructor for the client. Use {@link ClientBuilder} to create an instance.
@@ -29,7 +29,7 @@ public class DiscordClient {
      * @param token Discord bot token.
      * @param intents List of gateway intents.
      */
-    DiscordClient(String token, GatewayIntents[] intents, ClientPresence presence) {
+    DiscordClient(String token, GatewayIntents[] intents, UserPresence presence) {
         this.token = token;
         this.intents = intents;
         this.presence = presence;
@@ -60,9 +60,9 @@ public class DiscordClient {
 
     /**
      * @return Client's presence data.
-     * @see ClientPresence
+     * @see UserPresence
      */
-    public ClientPresence getPresence() {
+    public UserPresence getPresence() {
         return presence;
     }
 }

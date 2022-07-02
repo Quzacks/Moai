@@ -1,7 +1,7 @@
-package io.github.quzacks.maoi.gateway.websocket;
+package io.github.quzacks.maoi.gateway;
 
 import io.github.quzacks.maoi.DiscordClient;
-import io.github.quzacks.maoi.gateway.GatewayIntents;
+import io.github.quzacks.maoi.entity.intent.GatewayIntents;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -90,7 +90,6 @@ public class DiscordWebSocket {
                 new Timer().scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
-                        System.out.println("Trying to send heartbeat to gateway.");
                         socket.send(data.toString());
                     }
                 }, 0, interval);
@@ -110,7 +109,12 @@ public class DiscordWebSocket {
         for (GatewayIntents intent : client.getIntents())
             intentRaw += intent.getRaw();
 
-        System.out.println("Trying to authorize client with intents: " + intentRaw);
+        final JSONObject presence = client.getPresence() != null ? new JSONObject()
+            .put("activities", client.getPresence().getActivities())
+            .put("status", client.getPresence().getStatus().asString())
+            .put("since", client.getPresence().since())
+            .put("afk", client.getPresence().isAfk()) : null;
+
         // TODO: Optional presence data.
         final JSONObject auth = new JSONObject()
             .put("op", 2)
@@ -121,9 +125,11 @@ public class DiscordWebSocket {
                     .put("browser", "moai")
                     .put("device", "moai")
                 )
+                .put("presence", presence)
                 .put("intents", intentRaw)
             );
 
+        System.out.println(auth.toString(2));
         socket.send(auth.toString());
     }
 }
