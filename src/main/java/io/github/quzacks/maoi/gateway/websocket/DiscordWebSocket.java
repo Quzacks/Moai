@@ -1,24 +1,63 @@
 package io.github.quzacks.maoi.gateway.websocket;
 
+import io.github.quzacks.maoi.DiscordClient;
+import io.github.quzacks.maoi.gateway.GatewayIntents;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Chat server web socket client.
  */
 public class DiscordWebSocket {
-    private final String token; // Discord bot token.
+    /**
+     * Discord client instance.
+     */
+    private final DiscordClient client;
+    /**
+     * Actual web socket client instance.
+     */
+    private WebSocketClient socket;
 
     /**
      * Constructor for the class.
      *
-     * @param token Token of the Discord bot.
+     * @param client Instance of a Discord client.
      */
-    public DiscordWebSocket(String token) {
-        this.token = token;
+    public DiscordWebSocket(DiscordClient client) {
+        this.client = client;
+
+        try {
+            socket = new WebSocketClient(
+                    new URI("wss://gateway.discord.gg/?v=10&encoding=json")
+            ) {
+                @Override
+                public void onOpen(ServerHandshake serverHandshake) { }
+
+                @Override
+                public void onMessage(String s) {
+                    final JSONObject json = new JSONObject(s);
+                    handleResponse(json);
+                }
+
+                @Override
+                public void onClose(int i, String s, boolean b) {
+                    System.out.println("Connection has been closed with reason: " + s);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    e.printStackTrace();
+                }
+            };
+        } catch(URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -26,30 +65,65 @@ public class DiscordWebSocket {
      * This is required for real time events.
      */
     public void login() {
-        try {
-            final WebSocketClient socket = new WebSocketClient(new URI("")) {
-                @Override
-                public void onOpen(ServerHandshake serverHandshake) { }
+        socket.connect();
+    }
 
-                @Override
-                public void onMessage(String s) {
-                    System.out.println(s);
-                }
+    /**
+     * Handles JSON responses from the Discord gateway.
+     *
+     * @param response JSON response from the gateway.
+     */
+     private void handleResponse(final JSONObject response) {
+        // TODO: Debugging purposes. Remove after completion of the project.
+        System.out.println(response.toString(4));
 
-                @Override
-                public void onClose(int i, String s, boolean b) { }
+        final int op = response.getInt("op");
 
-                @Override
-                public void onError(Exception e) {
-                    e.printStackTrace();
-                    // TODO: Debug this.
-                }
-            };
+        switch (op) {
+            // Hello OP code.
+            case 10 -> {
+                final int interval = response.getJSONObject("d").getInt("heartbeat_interval");
+                final JSONObject data = new JSONObject()
+                    .put("op", 1)
+                    .put("d", "null");
 
-            socket.connect();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            // TODO: Debug this.
+                new Timer().scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        System.out.println("Trying to send heartbeat to gateway.");
+                        socket.send(data.toString());
+                    }
+                }, 0, interval);
+
+                authorizeClient();
+                break;
+            }
         }
+     }
+
+    /**
+     * Authorizes the client instance.
+     */
+    private void authorizeClient() {
+        int intentRaw = 0;
+
+        for (GatewayIntents intent : client.getIntents())
+            intentRaw += intent.getRaw();
+
+        System.out.println("Trying to authorize client with intents: " + intentRaw);
+        // TODO: Optional presence data.
+        final JSONObject auth = new JSONObject()
+            .put("op", 2)
+            .put("d", new JSONObject()
+                .put("token", client.getToken())
+                .put("properties", new JSONObject()
+                    .put("os", "windows")
+                    .put("browser", "moai")
+                    .put("device", "moai")
+                )
+                .put("intents", intentRaw)
+            );
+
+        socket.send(auth.toString());
     }
 }
