@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GatewayIntentsTest {
+class GatewayIntentTest {
     @Test
     @DisplayName("Get correct intent value.")
     void getRaw() {
         int intentRaw =
-                GatewayIntents.GUILDS.getRaw() +
-                        GatewayIntents.GUILD_MEMBERS.getRaw() +
-                        GatewayIntents.GUILD_BANS.getRaw();
+                GatewayIntent.GUILDS.getRaw() +
+                GatewayIntent.GUILD_MEMBERS.getRaw() +
+                GatewayIntent.GUILD_BANS.getRaw();
 
         assertEquals(7, intentRaw, "Sum of raw intents should be 7");
     }

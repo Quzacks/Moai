@@ -1,6 +1,6 @@
 package io.github.quzacks.maoi;
 
-import io.github.quzacks.maoi.entity.intent.GatewayIntents;
+import io.github.quzacks.maoi.entity.intent.GatewayIntent;
 import io.github.quzacks.maoi.entity.user.UserPresence;
 
 /**
@@ -16,7 +16,7 @@ public class ClientBuilder {
     /**
      * All intents.
      */
-    private GatewayIntents[] intents;
+    private GatewayIntent[] intents;
     /**
      * Client presence.
      */
@@ -47,7 +47,7 @@ public class ClientBuilder {
      * @param intents List of gateway intents.
      * @return {@link ClientBuilder}
      */
-    public ClientBuilder setIntents(final GatewayIntents... intents) {
+    public ClientBuilder setIntents(final GatewayIntent... intents) {
         this.intents = intents;
         return this;
     }

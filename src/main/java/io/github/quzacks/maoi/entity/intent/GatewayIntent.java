@@ -3,7 +3,7 @@ package io.github.quzacks.maoi.entity.intent;
 /**
  * Enumerates all available gateway intents for Discord.
  */
-public enum GatewayIntents {
+public enum GatewayIntent {
     GUILDS(0),
     GUILD_MEMBERS(1),
     GUILD_BANS(2),
@@ -34,7 +34,7 @@ public enum GatewayIntents {
      *
      * @param offset Offset of the intent.
      */
-    GatewayIntents(int offset) {
+    GatewayIntent(int offset) {
         this.raw = 1 << offset;
     }
 

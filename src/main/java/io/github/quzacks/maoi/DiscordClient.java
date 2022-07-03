@@ -1,14 +1,22 @@
 package io.github.quzacks.maoi;
 
-import io.github.quzacks.maoi.entity.intent.GatewayIntents;
+import io.github.quzacks.maoi.entity.intent.GatewayIntent;
+import io.github.quzacks.maoi.entity.user.User;
 import io.github.quzacks.maoi.gateway.DiscordWebSocket;
 import io.github.quzacks.maoi.entity.user.UserPresence;
+import io.github.quzacks.maoi.gateway.events.EventDispatcher;
+import io.github.quzacks.maoi.gateway.events.GenericEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Information about the Discord client.
  *
  * @see ClientBuilder
  */
+@SuppressWarnings("rawtypes")
 public class DiscordClient {
     /**
      * Client's Discord token.
@@ -17,11 +25,18 @@ public class DiscordClient {
     /**
      * All gateway intents for the client.
      */
-    private final GatewayIntents[] intents;
+    private final GatewayIntent[] intents;
     /**
      * Presence data.
      */
     private final UserPresence presence;
+    /**
+     * User data of the client.
+     * Initialized once the ready event is fired.
+     */
+    private User user;
+
+    private final List<EventDispatcher> listeners = new ArrayList<>();
 
     /**
      * Constructor for the client. Use {@link ClientBuilder} to create an instance.
@@ -29,7 +44,7 @@ public class DiscordClient {
      * @param token Discord bot token.
      * @param intents List of gateway intents.
      */
-    DiscordClient(String token, GatewayIntents[] intents, UserPresence presence) {
+    DiscordClient(String token, GatewayIntent[] intents, UserPresence presence) {
         this.token = token;
         this.intents = intents;
         this.presence = presence;
@@ -52,17 +67,47 @@ public class DiscordClient {
     /**
      *
      * @return Array of gateway intents.
-     * @see GatewayIntents
+     *
+     * @see GatewayIntent
      */
-    public GatewayIntents[] getIntents() {
+    public GatewayIntent[] getIntents() {
         return intents;
     }
 
     /**
      * @return Client's presence data.
+     *
      * @see UserPresence
      */
     public UserPresence getPresence() {
         return presence;
+    }
+
+    /**
+     * @return User data of the client.
+     *
+     * @see User
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * Set user data of client.
+     *
+     * @param user User instance.
+     *
+     * @see User
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public <E extends GenericEvent> void listen(final Class<E> eventClass, final Consumer<E> effect) {
+        listeners.add(new EventDispatcher<>(eventClass, effect));
+    }
+
+    public List<EventDispatcher> getListeners() {
+        return listeners;
     }
 }

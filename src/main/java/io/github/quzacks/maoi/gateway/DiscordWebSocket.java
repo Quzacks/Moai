@@ -1,15 +1,18 @@
 package io.github.quzacks.maoi.gateway;
 
 import io.github.quzacks.maoi.DiscordClient;
-import io.github.quzacks.maoi.entity.intent.GatewayIntents;
+import io.github.quzacks.maoi.entity.intent.GatewayIntent;
+import io.github.quzacks.maoi.gateway.events.EventType;
+import io.github.quzacks.maoi.gateway.events.GenericEvent;
+import io.github.quzacks.maoi.gateway.events.client.ClientReadyEvent;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Chat server web socket client.
@@ -41,8 +44,11 @@ public class DiscordWebSocket {
 
                 @Override
                 public void onMessage(String s) {
-                    final JSONObject json = new JSONObject(s);
-                    handleResponse(json);
+                    // TODO: Debugging. Remove after project completion.
+                    final JSONObject response = new JSONObject(s);
+                    System.out.println(response.toString(4));
+                    final Payload payload = new Payload(response);
+                    handleResponse(payload);
                 }
 
                 @Override
@@ -69,33 +75,35 @@ public class DiscordWebSocket {
     }
 
     /**
-     * Handles JSON responses from the Discord gateway.
+     * Handles payload from the Discord gateway.
      *
-     * @param response JSON response from the gateway.
+     * @param payload Payload constructed from gateway response.
      */
-     private void handleResponse(final JSONObject response) {
-        // TODO: Debugging purposes. Remove after completion of the project.
-        System.out.println(response.toString(4));
-
-        final int op = response.getInt("op");
-
-        switch (op) {
-            // Hello OP code.
+     @SuppressWarnings("unchecked")
+     private void handleResponse(final Payload payload) {
+        switch (payload.op()) {
             case 10 -> {
-                final int interval = response.getJSONObject("d").getInt("heartbeat_interval");
+                final int interval = payload.data().getInt("heartbeat_interval");
                 final JSONObject data = new JSONObject()
                     .put("op", 1)
                     .put("d", "null");
 
-                new Timer().scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        socket.send(data.toString());
-                    }
-                }, 0, interval);
-
+                Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(
+                    () -> socket.send(data.toString()),
+                    0,
+                    interval, TimeUnit.MILLISECONDS
+                );
                 authorizeClient();
-                break;
+            }
+            case 0 -> {
+                final GenericEvent event = switch(EventType.valueOf(payload.name())) {
+                    case READY -> new ClientReadyEvent(payload.data(), client);
+                };
+
+                //noinspection unchecked
+                client.getListeners().stream().filter(l ->
+                    l.getEventClass() == event.getClass()).forEach(l -> l.getEffect().accept(event)
+                );
             }
         }
      }
@@ -106,7 +114,7 @@ public class DiscordWebSocket {
     private void authorizeClient() {
         int intentRaw = 0;
 
-        for (GatewayIntents intent : client.getIntents())
+        for (GatewayIntent intent : client.getIntents())
             intentRaw += intent.getRaw();
 
         final JSONObject presence = client.getPresence() != null ? new JSONObject()
@@ -115,7 +123,6 @@ public class DiscordWebSocket {
             .put("since", client.getPresence().since())
             .put("afk", client.getPresence().isAfk()) : null;
 
-        // TODO: Optional presence data.
         final JSONObject auth = new JSONObject()
             .put("op", 2)
             .put("d", new JSONObject()
@@ -129,7 +136,6 @@ public class DiscordWebSocket {
                 .put("intents", intentRaw)
             );
 
-        System.out.println(auth.toString(2));
         socket.send(auth.toString());
     }
 }
