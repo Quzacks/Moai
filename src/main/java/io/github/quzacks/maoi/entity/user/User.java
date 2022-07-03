@@ -1,5 +1,9 @@
 package io.github.quzacks.maoi.entity.user;
 
+import org.json.JSONObject;
+
+import java.util.EnumSet;
+
 /**
  * Represents a client/user on Discord.
  */
@@ -33,33 +37,28 @@ public class User {
      */
     private final boolean verified;
 
+    private final EnumSet<UserFlag> flags = EnumSet.noneOf(UserFlag.class);
+
     /**
-     * Initializes User instance.
+     * Initializes User instance from JSON.
      *
-     * @param id ID of the user.
-     * @param username Username of the user.
-     * @param discriminator Discriminator of the user.
-     * @param avatar Avatar hash code of the user.
-     * @param bot Whether user is a bot.
-     * @param email Email of the user.
-     * @param verified Whether user's email is verified.
+     * @param data JSON object.
      */
-    public User(
-        String id,
-        String username,
-        String discriminator,
-        String avatar,
-        boolean bot,
-        String email,
-        boolean verified
-    ) {
-        this.id = id;
-        this.username = username;
-        this.discriminator = discriminator;
-        this.avatar = avatar;
-        this.bot = bot;
-        this.email = email;
-        this.verified = verified;
+    public User(JSONObject data) {
+        this.id = data.getString("id");
+        this.username = data.getString("username");
+        this.discriminator = data.getString("discriminator");
+        this.avatar = data.isNull("avatar") ? null : data.getString("avatar");
+        this.bot = data.getBoolean("bot");
+        this.email = data.isNull("email") ? null : data.getString("email");
+        this.verified = data.getBoolean("verified");
+
+        if(!data.isNull("public_flags")) {
+            final int publicFlags = data.getInt("public_flags");
+            for (UserFlag flag : UserFlag.values()) {
+                if((flag.getRaw() & publicFlags) == flag.getRaw()) flags.add(flag);
+            }
+        }
     }
 
     /**
@@ -109,5 +108,12 @@ public class User {
      */
     public boolean isVerified() {
         return verified;
+    }
+
+    /**
+     * @return List of flags the user has.
+     */
+    public EnumSet<UserFlag> getFlags() {
+        return flags;
     }
 }

@@ -4,11 +4,29 @@ package io.github.quzacks.maoi.entity.user.activity;
  * Enumerates all activities on Discord.
  */
 public enum ActivityType {
+    /**
+     * Playing a game.
+     */
     GAME(0),
+    /**
+     * Live streaming.
+     */
     STREAMING(1),
+    /**
+     * Listening to something.
+     */
     LISTENING(2),
+    /**
+     * User is watching something.
+     */
     WATCHING(3),
+    /**
+     * Custom message.
+     */
     CUSTOM(4),
+    /**
+     * Competing in a competition.
+     */
     COMPETING(5);
 
     /**

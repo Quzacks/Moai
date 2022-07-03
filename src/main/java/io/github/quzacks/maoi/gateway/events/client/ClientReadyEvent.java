@@ -33,17 +33,7 @@ public class ClientReadyEvent extends GenericEvent {
 
         JSONObject user = data.getJSONObject("user");
 
-        client.setUser(
-            new User(
-                user.getString("id"),
-                user.getString("username"),
-                user.getString("discriminator"),
-                user.getString("avatar"),
-                user.getBoolean("bot"),
-                user.isNull("email") ? null : user.getString("email"),
-                user.getBoolean("verified")
-            )
-        );
+        client.setUser(new User(user));
     }
 
     /**
