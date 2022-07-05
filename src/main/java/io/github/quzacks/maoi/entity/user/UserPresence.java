@@ -1,6 +1,6 @@
 package io.github.quzacks.maoi.entity.user;
 
-import io.github.quzacks.maoi.entity.user.activity.Activity;
+import io.github.quzacks.maoi.entity.activity.Activity;
 
 /**
  * Data class to represent a client's presence.

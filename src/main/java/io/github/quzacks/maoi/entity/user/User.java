@@ -36,7 +36,11 @@ public class User {
      * Whether user's email is verified.
      */
     private final boolean verified;
-
+    /**
+     * Flags of the user.
+     *
+     * @see UserFlag
+     */
     private final EnumSet<UserFlag> flags = EnumSet.noneOf(UserFlag.class);
 
     /**
@@ -49,9 +53,11 @@ public class User {
         this.username = data.getString("username");
         this.discriminator = data.getString("discriminator");
         this.avatar = data.isNull("avatar") ? null : data.getString("avatar");
-        this.bot = data.getBoolean("bot");
+        this.bot = !data.isNull("bot") && data.getBoolean("bot");
         this.email = data.isNull("email") ? null : data.getString("email");
-        this.verified = data.getBoolean("verified");
+        if(!data.isNull("verified")) {
+            this.verified = data.getBoolean("verified");
+        } else this.verified = false;
 
         if(!data.isNull("public_flags")) {
             final int publicFlags = data.getInt("public_flags");

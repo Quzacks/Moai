@@ -2,6 +2,11 @@ package io.github.quzacks.maoi.gateway.events;
 
 import java.util.function.Consumer;
 
+/**
+ * Used to listen to events.
+ *
+ * @see GenericEvent
+ */
 public class EventDispatcher<E extends GenericEvent> {
     /**
      * Class of the event it is listening to.
@@ -31,9 +36,9 @@ public class EventDispatcher<E extends GenericEvent> {
     }
 
     /**
-     * @return Code to run.
+     * Runs the consumer.
      */
-    public Consumer<E> getEffect() {
-        return effect;
+    public void run(E instance) {
+        effect.accept(instance);
     }
 }

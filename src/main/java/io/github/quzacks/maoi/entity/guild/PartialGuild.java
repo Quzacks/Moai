@@ -1,5 +1,8 @@
 package io.github.quzacks.maoi.entity.guild;
 
+/**
+ * Partial guild information on Discord.
+ */
 public class PartialGuild {
     /**
      * ID of the guild

@@ -35,7 +35,9 @@ public class DiscordClient {
      * Initialized once the ready event is fired.
      */
     private User user;
-
+    /**
+     * List of event listeners.
+     */
     private final List<EventDispatcher> listeners = new ArrayList<>();
 
     /**
@@ -103,10 +105,23 @@ public class DiscordClient {
         this.user = user;
     }
 
+    /**
+     * Registers an event dispatcher.
+     *
+     * @param eventClass Event to listen to.
+     * @param effect Code to run when event fires.
+     *
+     * @see GenericEvent
+     */
     public <E extends GenericEvent> void listen(final Class<E> eventClass, final Consumer<E> effect) {
         listeners.add(new EventDispatcher<>(eventClass, effect));
     }
 
+    /**
+     * @return All registered listeners.
+     *
+     * @see EventDispatcher
+     */
     public List<EventDispatcher> getListeners() {
         return listeners;
     }

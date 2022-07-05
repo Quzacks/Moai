@@ -1,4 +1,4 @@
-package io.github.quzacks.maoi.entity.user.activity;
+package io.github.quzacks.maoi.entity.activity;
 
 import org.json.JSONPropertyIgnore;
 

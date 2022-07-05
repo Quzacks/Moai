@@ -5,6 +5,7 @@ import io.github.quzacks.maoi.entity.intent.GatewayIntent;
 import io.github.quzacks.maoi.gateway.events.EventType;
 import io.github.quzacks.maoi.gateway.events.GenericEvent;
 import io.github.quzacks.maoi.gateway.events.client.ClientReadyEvent;
+import io.github.quzacks.maoi.gateway.events.message.MessageCreateEvent;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -44,7 +45,7 @@ public class DiscordWebSocket {
 
                 @Override
                 public void onMessage(String s) {
-                    // TODO: Debugging. Remove after project completion.
+                    // TODO: Remove after project completion.
                     final JSONObject response = new JSONObject(s);
                     System.out.println(response.toString(4));
                     final Payload payload = new Payload(response);
@@ -98,11 +99,11 @@ public class DiscordWebSocket {
             case 0 -> {
                 final GenericEvent event = switch(EventType.valueOf(payload.name())) {
                     case READY -> new ClientReadyEvent(payload.data(), client);
+                    case MESSAGE_CREATE -> new MessageCreateEvent(payload.data(), client);
                 };
 
-                //noinspection unchecked
                 client.getListeners().stream().filter(l ->
-                    l.getEventClass() == event.getClass()).forEach(l -> l.getEffect().accept(event)
+                    l.getEventClass() == event.getClass()).forEach(l -> l.run(event)
                 );
             }
         }
