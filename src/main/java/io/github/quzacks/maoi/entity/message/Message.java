@@ -128,7 +128,7 @@ public class Message {
     public Message(JSONObject data) {
         this.id = data.getString("id");
         // TODO: Create an actual instance.
-        this.channel = new Channel();
+        this.channel = null;
         // TODO: Create guild instance.
         this.guild = data.isNull("guild_id") ? null : new Guild();
         this.author = !data.isNull("webhook_id") ? null : new User(data.getJSONObject("author"));

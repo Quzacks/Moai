@@ -4,8 +4,8 @@ import io.github.quzacks.maoi.entity.intent.GatewayIntent;
 import io.github.quzacks.maoi.entity.user.User;
 import io.github.quzacks.maoi.gateway.DiscordWebSocket;
 import io.github.quzacks.maoi.entity.user.UserPresence;
-import io.github.quzacks.maoi.gateway.events.EventDispatcher;
-import io.github.quzacks.maoi.gateway.events.GenericEvent;
+import io.github.quzacks.maoi.events.EventDispatcher;
+import io.github.quzacks.maoi.events.GenericEvent;
 
 import java.util.ArrayList;
 import java.util.List;

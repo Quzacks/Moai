@@ -1,4 +1,4 @@
-package io.github.quzacks.maoi.gateway.events;
+package io.github.quzacks.maoi.events;
 
 /**
  * Enumerates all Discord events from the gateway.

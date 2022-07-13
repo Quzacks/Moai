@@ -1,4 +1,4 @@
-package io.github.quzacks.maoi.gateway.events;
+package io.github.quzacks.maoi.events;
 
 import java.util.function.Consumer;
 

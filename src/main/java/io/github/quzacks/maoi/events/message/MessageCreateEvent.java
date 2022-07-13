@@ -1,8 +1,8 @@
-package io.github.quzacks.maoi.gateway.events.message;
+package io.github.quzacks.maoi.events.message;
 
 import io.github.quzacks.maoi.DiscordClient;
 import io.github.quzacks.maoi.entity.message.Message;
-import io.github.quzacks.maoi.gateway.events.GenericEvent;
+import io.github.quzacks.maoi.events.GenericEvent;
 import org.json.JSONObject;
 
 /**

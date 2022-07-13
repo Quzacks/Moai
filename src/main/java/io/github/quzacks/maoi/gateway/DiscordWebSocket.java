@@ -2,10 +2,10 @@ package io.github.quzacks.maoi.gateway;
 
 import io.github.quzacks.maoi.DiscordClient;
 import io.github.quzacks.maoi.entity.intent.GatewayIntent;
-import io.github.quzacks.maoi.gateway.events.EventType;
-import io.github.quzacks.maoi.gateway.events.GenericEvent;
-import io.github.quzacks.maoi.gateway.events.client.ClientReadyEvent;
-import io.github.quzacks.maoi.gateway.events.message.MessageCreateEvent;
+import io.github.quzacks.maoi.events.EventType;
+import io.github.quzacks.maoi.events.GenericEvent;
+import io.github.quzacks.maoi.events.client.ClientReadyEvent;
+import io.github.quzacks.maoi.events.message.MessageCreateEvent;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;

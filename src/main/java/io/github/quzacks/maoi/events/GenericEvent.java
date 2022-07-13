@@ -1,4 +1,4 @@
-package io.github.quzacks.maoi.gateway.events;
+package io.github.quzacks.maoi.events;
 
 import io.github.quzacks.maoi.DiscordClient;
 import org.json.JSONObject;

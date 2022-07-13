@@ -1,9 +1,9 @@
-package io.github.quzacks.maoi.gateway.events.client;
+package io.github.quzacks.maoi.events.client;
 
 import io.github.quzacks.maoi.DiscordClient;
 import io.github.quzacks.maoi.entity.guild.PartialGuild;
 import io.github.quzacks.maoi.entity.user.User;
-import io.github.quzacks.maoi.gateway.events.GenericEvent;
+import io.github.quzacks.maoi.events.GenericEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

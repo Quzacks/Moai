@@ -20,7 +20,8 @@ class PayloadTest {
 
     @Test
     void deserialize() {
-        assertAll(() -> assertEquals(payload.op(), 10),
+        assertAll(
+            () -> assertEquals(payload.op(), 10),
             () -> assertEquals(payload.name(), "EVENT_NAME"),
             () -> assertNull(payload.data()),
             () -> assertEquals(payload.sequence(), -10)
