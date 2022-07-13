@@ -34,7 +34,7 @@ Use the `client#listen` to listen to events.
 public static void main(String[] args) {
   final DiscordClient client = ...;
 
-  // Fires on initialize handshake with the Discord gateway.
+  // Fires on initial handshake with the Discord gateway.
   client.listen(ClientReadyEvent.class, e -> 
     System.out.println(e.getClient().getUser().getUsername())
   );
