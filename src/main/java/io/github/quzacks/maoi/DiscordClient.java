@@ -39,6 +39,12 @@ public class DiscordClient {
      * List of event listeners.
      */
     private final List<EventDispatcher> listeners = new ArrayList<>();
+    /**
+     * Web socket for the gateway.
+     *
+     * @see DiscordWebSocket
+     */
+    private final DiscordWebSocket socket;
 
     /**
      * Constructor for the client. Use {@link ClientBuilder} to create an instance.
@@ -50,13 +56,15 @@ public class DiscordClient {
         this.token = token;
         this.intents = intents;
         this.presence = presence;
+
+        this.socket = new DiscordWebSocket(this);
     }
 
     /**
      * Opens a web socket connection to the Discord gateway.
      */
     public void start() {
-        new DiscordWebSocket(this).login();
+        socket.login();
     }
 
     /**
@@ -124,5 +132,16 @@ public class DiscordClient {
      */
     public List<EventDispatcher> getListeners() {
         return listeners;
+    }
+
+    /**
+     * Updates the client's presence.
+     *
+     * @param presence User presence instance.
+     *
+     * @see UserPresence
+     */
+    public void updatePresence(UserPresence presence) {
+        socket.updatePresence(presence);
     }
 }

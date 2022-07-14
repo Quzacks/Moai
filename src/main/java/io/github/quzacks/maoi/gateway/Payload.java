@@ -9,7 +9,7 @@ public class Payload {
     /**
      * The OP code response.
      */
-    private final int op;
+    private final OpCode op;
     /**
      * Data from the response.
      */
@@ -30,7 +30,7 @@ public class Payload {
      * @param response JSON object from Discord gateway.
      */
     Payload(final JSONObject response) {
-        this.op = response.getInt("op");
+        this.op = OpCode.fromCode(response.getInt("op"));
         this.data = response.isNull("d") ? null : response.getJSONObject("d");
         this.sequence = response.isNull("s") ? -10 : response.getInt("s");
         this.name = response.isNull("t") ? "null" : response.getString("t");
@@ -38,8 +38,9 @@ public class Payload {
 
     /**
      * @return OP code.
-     */
-    public int op() {
+     *
+     * @see OpCode
+     */    public OpCode op() {
         return op;
     }
 

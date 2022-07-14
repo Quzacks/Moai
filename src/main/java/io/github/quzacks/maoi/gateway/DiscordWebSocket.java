@@ -2,6 +2,7 @@ package io.github.quzacks.maoi.gateway;
 
 import io.github.quzacks.maoi.DiscordClient;
 import io.github.quzacks.maoi.entity.intent.GatewayIntent;
+import io.github.quzacks.maoi.entity.user.UserPresence;
 import io.github.quzacks.maoi.events.EventType;
 import io.github.quzacks.maoi.events.GenericEvent;
 import io.github.quzacks.maoi.events.client.ClientReadyEvent;
@@ -83,7 +84,7 @@ public class DiscordWebSocket {
      @SuppressWarnings("unchecked")
      private void handleResponse(final Payload payload) {
         switch (payload.op()) {
-            case 10 -> {
+            case HELLO -> {
                 final int interval = payload.data().getInt("heartbeat_interval");
                 final JSONObject data = new JSONObject()
                     .put("op", 1)
@@ -96,15 +97,13 @@ public class DiscordWebSocket {
                 );
                 authorizeClient();
             }
-            case 0 -> {
+            case DISPATCH -> {
                 final GenericEvent event = switch(EventType.valueOf(payload.name())) {
                     case READY -> new ClientReadyEvent(payload.data(), client);
                     case MESSAGE_CREATE -> new MessageCreateEvent(payload.data(), client);
                 };
 
-                client.getListeners().stream().filter(l ->
-                    l.getEventClass() == event.getClass()).forEach(l -> l.run(event)
-                );
+                client.getListeners().stream().filter(l -> l.getEventClass() == event.getClass()).forEach(l -> l.run(event));
             }
         }
      }
@@ -125,7 +124,7 @@ public class DiscordWebSocket {
             .put("afk", client.getPresence().isAfk()) : null;
 
         final JSONObject auth = new JSONObject()
-            .put("op", 2)
+            .put("op", OpCode.IDENTIFY.getCode())
             .put("d", new JSONObject()
                 .put("token", client.getToken())
                 .put("properties", new JSONObject()
@@ -138,5 +137,24 @@ public class DiscordWebSocket {
             );
 
         socket.send(auth.toString());
+    }
+
+    /**
+     * Updates the clients presence.
+     *
+     * @param presence New bot presence.
+     */
+    public void updatePresence(final UserPresence presence) {
+        final JSONObject data = presence != null ? new JSONObject()
+                .put("activities", presence.getActivities())
+                .put("status", presence.getStatus().asString())
+                .put("since", presence.since())
+                .put("afk", presence.isAfk()) : null;
+
+        final JSONObject presenceUpdate = new JSONObject()
+            .put("op", OpCode.PRESENCE_UPDATE.getCode())
+            .put("d", data);
+
+        socket.send(presenceUpdate.toString());
     }
 }
