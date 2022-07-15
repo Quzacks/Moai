@@ -6,9 +6,15 @@ import io.github.quzacks.maoi.gateway.DiscordWebSocket;
 import io.github.quzacks.maoi.entity.user.UserPresence;
 import io.github.quzacks.maoi.events.EventDispatcher;
 import io.github.quzacks.maoi.events.GenericEvent;
+import io.github.quzacks.maoi.interaction.CommandRegistry;
+import io.github.quzacks.maoi.interaction.slash_command.SlashCommand;
+import io.github.quzacks.maoi.interaction.slash_command.SlashCommandOption;
+import io.github.quzacks.maoi.interaction.slash_command.SlashCommandOptionChoice;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -45,6 +51,12 @@ public class DiscordClient {
      * @see DiscordWebSocket
      */
     private final DiscordWebSocket socket;
+    /**
+     * List of all commands for the client.
+     *
+     * @see CommandRegistry
+     */
+    private final CommandRegistry commandRegistry;
 
     /**
      * Constructor for the client. Use {@link ClientBuilder} to create an instance.
@@ -58,6 +70,7 @@ public class DiscordClient {
         this.presence = presence;
 
         this.socket = new DiscordWebSocket(this);
+        this.commandRegistry = new CommandRegistry();
     }
 
     /**
@@ -65,6 +78,45 @@ public class DiscordClient {
      */
     public void start() {
         socket.login();
+        registerCommands();
+    }
+
+    /**
+     * Posts command data to the Discord HTTP API.
+     */
+    private void registerCommands() {
+        for(Map.Entry<SlashCommand, Boolean> entry : commandRegistry.getSlashCommands().entrySet()) {
+            final SlashCommand command = entry.getKey();
+            final JSONObject data = new JSONObject()
+                .put("name", command.getName())
+                .put("type", command.getType().getType())
+                .put("description", command.getDescription());
+
+            if(command.getOptions() != null) {
+                for(SlashCommandOption option : command.getOptions()) {
+                    final JSONObject optionData = new JSONObject()
+                        .put("name", option.getName())
+                        .put("description", option.getDescription())
+                        .put("type", option.getType().getValue())
+                        .put("required", option.isRequired());
+
+                    if(option.getChoices() != null) {
+                        for(SlashCommandOptionChoice choice : option.getChoices()) {
+                            optionData.accumulate(
+                                    "choices",
+                                    new JSONObject()
+                                            .put("name", choice.getName())
+                                            .put("value", choice.getValue())
+                            );
+                        }
+                    }
+
+                    data.accumulate("options", optionData);
+                }
+            }
+
+            // TODO: Post request with data.
+        }
     }
 
     /**
@@ -143,5 +195,14 @@ public class DiscordClient {
      */
     public void updatePresence(UserPresence presence) {
         socket.updatePresence(presence);
+    }
+
+    /**
+     * @return Command registry.
+     *
+     * @see CommandRegistry
+     */
+    public CommandRegistry getCommandRegistry() {
+        return commandRegistry;
     }
 }
