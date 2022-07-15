@@ -28,7 +28,7 @@ Additionally, you can set the client's presence using `setPresence(UserPresence)
 
 ## Events
 
-Use the `client#listen` to listen to events.
+Use the `client#listen` method to listen to events.
 
 ```java
 public static void main(String[] args) {
