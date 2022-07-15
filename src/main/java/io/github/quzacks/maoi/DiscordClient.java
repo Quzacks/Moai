@@ -1,15 +1,19 @@
 package io.github.quzacks.maoi;
 
+import io.github.quzacks.maoi.entity.application.Application;
 import io.github.quzacks.maoi.entity.intent.GatewayIntent;
 import io.github.quzacks.maoi.entity.user.User;
 import io.github.quzacks.maoi.gateway.DiscordWebSocket;
 import io.github.quzacks.maoi.entity.user.UserPresence;
 import io.github.quzacks.maoi.events.EventDispatcher;
 import io.github.quzacks.maoi.events.GenericEvent;
+import io.github.quzacks.maoi.http.HttpRequest;
+import io.github.quzacks.maoi.http.HttpRequestType;
 import io.github.quzacks.maoi.interaction.CommandRegistry;
 import io.github.quzacks.maoi.interaction.slash_command.SlashCommand;
 import io.github.quzacks.maoi.interaction.slash_command.SlashCommandOption;
 import io.github.quzacks.maoi.interaction.slash_command.SlashCommandOptionChoice;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -57,6 +61,12 @@ public class DiscordClient {
      * @see CommandRegistry
      */
     private final CommandRegistry commandRegistry;
+    /**
+     * Client application.
+     *
+     * @see Application
+     */
+    private Application application;
 
     /**
      * Constructor for the client. Use {@link ClientBuilder} to create an instance.
@@ -78,14 +88,13 @@ public class DiscordClient {
      */
     public void start() {
         socket.login();
-        registerCommands();
     }
 
     /**
      * Posts command data to the Discord HTTP API.
      */
-    private void registerCommands() {
-        for(Map.Entry<SlashCommand, Boolean> entry : commandRegistry.getSlashCommands().entrySet()) {
+    public void registerCommands() {
+        for(Map.Entry<SlashCommand, String> entry : commandRegistry.getSlashCommands().entrySet()) {
             final SlashCommand command = entry.getKey();
             final JSONObject data = new JSONObject()
                 .put("name", command.getName())
@@ -93,6 +102,7 @@ public class DiscordClient {
                 .put("description", command.getDescription());
 
             if(command.getOptions() != null) {
+                data.put("options", new JSONArray());
                 for(SlashCommandOption option : command.getOptions()) {
                     final JSONObject optionData = new JSONObject()
                         .put("name", option.getName())
@@ -101,12 +111,12 @@ public class DiscordClient {
                         .put("required", option.isRequired());
 
                     if(option.getChoices() != null) {
+                        optionData.put("choices", new JSONArray());
                         for(SlashCommandOptionChoice choice : option.getChoices()) {
                             optionData.accumulate(
-                                    "choices",
-                                    new JSONObject()
-                                            .put("name", choice.getName())
-                                            .put("value", choice.getValue())
+                                "choices", new JSONObject()
+                                    .put("name", choice.getName())
+                                    .put("value", choice.getValue())
                             );
                         }
                     }
@@ -115,7 +125,13 @@ public class DiscordClient {
                 }
             }
 
-            // TODO: Post request with data.
+            final String path = entry.getValue() == null ?
+                "applications/<app_id>/commands" : "applications/<app_id>/guilds/" + entry.getValue() + "/commands";
+
+            new HttpRequest(path.replace("<app_id>", getApplication().getId()))
+                .requestType(HttpRequestType.POST)
+                .withJson(data)
+                .execute(this);
         }
     }
 
@@ -204,5 +220,25 @@ public class DiscordClient {
      */
     public CommandRegistry getCommandRegistry() {
         return commandRegistry;
+    }
+
+    /**
+     * @return Application.
+     *
+     * @see Application
+     */
+    public Application getApplication() {
+        return application;
+    }
+
+    /**
+     * Set client application.
+     *
+     * @param application Application instance.
+     *
+     * @see Application
+     */
+    public void setApplication(Application application) {
+        this.application = application;
     }
 }

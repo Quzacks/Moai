@@ -1,6 +1,7 @@
 package io.github.quzacks.maoi.events.client;
 
 import io.github.quzacks.maoi.DiscordClient;
+import io.github.quzacks.maoi.entity.application.Application;
 import io.github.quzacks.maoi.entity.guild.PartialGuild;
 import io.github.quzacks.maoi.entity.user.User;
 import io.github.quzacks.maoi.events.GenericEvent;
@@ -31,9 +32,10 @@ public class ClientReadyEvent extends GenericEvent {
         for(int i = 0; i < guilds.length(); i++)
             this.guilds.add(new PartialGuild(guilds.getJSONObject(i).getString("id")));
 
-        JSONObject user = data.getJSONObject("user");
+        client.setUser(new User(data.getJSONObject("user")));
+        client.setApplication(new Application(data.getJSONObject("application")));
 
-        client.setUser(new User(user));
+        client.registerCommands();
     }
 
     /**

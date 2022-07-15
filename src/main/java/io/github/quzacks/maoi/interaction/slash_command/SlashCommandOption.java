@@ -75,7 +75,7 @@ public class SlashCommandOption {
             String name,
             String description,
             boolean required,
-            SlashCommandOptionChoice[] choices
+            SlashCommandOptionChoice... choices
     ) {
         this.type = type;
         this.name = name;
@@ -91,7 +91,7 @@ public class SlashCommandOption {
             String name,
             String description,
             boolean required,
-            SlashCommandOption[] options
+            SlashCommandOption... options
     ) {
         this.type = type;
         this.name = name;
