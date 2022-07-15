@@ -42,3 +42,77 @@ public static void main(String[] args) {
 ```
 
 You can have multiple listeners of the same type.
+
+## Commands
+
+### Slash commands
+
+Slash commands are the native way of creating chat input commands on Discord. Moai provides an easy interface to build your slash commands. Let's create our own slash command.
+
+* Step 1: Create a class that extends [`SlashCommand`](src/main/java/io/github/quzacks/interaction/slash_command/SlashCommand).
+
+```java
+public class LogCommand extends SlashCommand { }
+```
+
+* Step 2: Create a constructor for the command and provide necessary information.
+
+```java
+public LogCommand() {
+  super(
+    "log",
+    "Logs a message in the console.",
+    new SlashCommandOption(
+      SlashCommandOptionType.STRING,
+      "message",
+      "Message you want to log.",
+      true
+    )
+  );
+}
+```
+
+* Step 3: Override the `run()` method from the super class.
+
+```java
+@Override
+public void run(Member member, Object[] options) {
+  final String message = (String) options[0];
+
+  System.out.println(member.getUser().getUsername() + " logged: " + message);
+}
+```
+
+You should've ended up with something like this.
+
+```java
+public class LogCommand extends SlashCommand {
+  public LogCommand() {
+    super(
+      "log",
+      "Logs a message in the console.",
+      new SlashCommandOption(
+        SlashCommandOptionType.STRING,
+        "message",
+        "Message you want to log.",
+        true
+      )
+    );
+  }
+
+  @Override
+  public void run(Member member, Object[] options) {
+    final String message = (String) options[0];
+
+    System.out.println(member.getUser().getUsername() + " logged: " + message);
+  }
+}
+```
+
+* Step 5: Finally, register the command:
+
+```java
+client.getCommandRegistry().register(new LogCommand()); // <-- This registers it globally.
+```
+
+You can register the command in a singular guild using the `CommandRegistry#register(SlashCommand command, String guildId)` method.
