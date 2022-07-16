@@ -76,10 +76,10 @@ public LogCommand() {
 
 ```java
 @Override
-public void run(Member member, Object[] options) {
+public void run(Interaction interaction, Object[] options) {
   final String message = (String) options[0];
 
-  System.out.println(member.getUser().getUsername() + " logged: " + message);
+  System.out.println("Logged: " message);
 }
 ```
 
@@ -101,10 +101,10 @@ public class LogCommand extends SlashCommand {
   }
 
   @Override
-  public void run(Member member, Object[] options) {
+  public void run(Interaction interaction, Object[] options) {
     final String message = (String) options[0];
 
-    System.out.println(member.getUser().getUsername() + " logged: " + message);
+    System.out.println("Logged: " message);
   }
 }
 ```
