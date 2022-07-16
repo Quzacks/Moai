@@ -1,5 +1,5 @@
 # Moai
-Java implementation of the Discord library wrapper. Wraps around the most recent API version, which as of this writing is [v10](https://discord.com/developers/docs/intro).
+Java implementation of the Discord library. Wraps around the most recent API version, which as of this writing is [v10](https://discord.com/developers/docs/intro).
 
 Not well-made or applicable to actual projects. If you're working on something similar, feel free to poke around the spaghetti code.
 
