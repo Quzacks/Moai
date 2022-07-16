@@ -29,4 +29,16 @@ public enum ApplicationCommandType {
     public int getType() {
         return type;
     }
+
+    /**
+     * Get application command type by value.
+     *
+     * @param value Value.
+     * @return Command type.
+     */
+    public static ApplicationCommandType fromValue(int value) {
+        for(ApplicationCommandType type : ApplicationCommandType.values())
+            if(type.getType() == value) return type;
+        return null;
+    }
 }

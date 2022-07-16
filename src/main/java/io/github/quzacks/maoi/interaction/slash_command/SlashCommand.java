@@ -2,7 +2,11 @@ package io.github.quzacks.maoi.interaction.slash_command;
 
 import io.github.quzacks.maoi.entity.user.User;
 import io.github.quzacks.maoi.interaction.ApplicationCommand;
+import io.github.quzacks.maoi.interaction.ApplicationCommandOptionData;
 import io.github.quzacks.maoi.interaction.ApplicationCommandType;
+import io.github.quzacks.maoi.interaction.Interaction;
+
+import java.util.List;
 
 /**
  * Represents a Discord slash command.
@@ -39,9 +43,10 @@ public abstract class SlashCommand extends ApplicationCommand {
     /**
      * Function called when command is ran.
      *
-     * @param user User who ran it.
+     * @param interaction Interaction object
+     * @param options Option values.
      */
-    public abstract void run(User user);
+    public abstract void run(Interaction interaction, Object[] options);
 
     @Override
     public ApplicationCommandType getType() {

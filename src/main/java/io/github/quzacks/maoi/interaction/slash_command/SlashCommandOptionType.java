@@ -63,4 +63,16 @@ public enum SlashCommandOptionType {
     public int getValue() {
         return value;
     }
+
+    /**
+     * Get option type from value.
+     *
+     * @param value Value.
+     * @return Slash command option type.
+     */
+     public static SlashCommandOptionType fromValue(int value) {
+        for(SlashCommandOptionType type : SlashCommandOptionType.values())
+            if(type.getValue() == value) return type;
+        return null;
+     }
 }

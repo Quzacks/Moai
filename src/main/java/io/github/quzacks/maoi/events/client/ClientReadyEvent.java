@@ -5,6 +5,7 @@ import io.github.quzacks.maoi.entity.application.Application;
 import io.github.quzacks.maoi.entity.guild.PartialGuild;
 import io.github.quzacks.maoi.entity.user.User;
 import io.github.quzacks.maoi.events.GenericEvent;
+import io.github.quzacks.maoi.exception.BadRequestException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,7 +36,11 @@ public class ClientReadyEvent extends GenericEvent {
         client.setUser(new User(data.getJSONObject("user")));
         client.setApplication(new Application(data.getJSONObject("application")));
 
-        client.registerCommands();
+        try {
+            client.registerCommands();
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

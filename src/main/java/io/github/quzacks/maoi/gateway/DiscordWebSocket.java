@@ -6,13 +6,18 @@ import io.github.quzacks.maoi.entity.user.UserPresence;
 import io.github.quzacks.maoi.events.EventType;
 import io.github.quzacks.maoi.events.GenericEvent;
 import io.github.quzacks.maoi.events.client.ClientReadyEvent;
+import io.github.quzacks.maoi.events.interaction.InteractionCreateEvent;
 import io.github.quzacks.maoi.events.message.MessageCreateEvent;
+import io.github.quzacks.maoi.interaction.ApplicationCommandOptionData;
+import io.github.quzacks.maoi.interaction.InteractionType;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -101,9 +106,31 @@ public class DiscordWebSocket {
                 final GenericEvent event = switch(EventType.valueOf(payload.name())) {
                     case READY -> new ClientReadyEvent(payload.data(), client);
                     case MESSAGE_CREATE -> new MessageCreateEvent(payload.data(), client);
+                    case INTERACTION_CREATE -> new InteractionCreateEvent(payload.data(), client);
                 };
 
-                client.getListeners().stream().filter(l -> l.getEventClass() == event.getClass()).forEach(l -> l.run(event));
+                if(event instanceof InteractionCreateEvent interactionEvent) {
+                    final List<Object> options = new ArrayList<>();
+                    for(ApplicationCommandOptionData option : interactionEvent.getInteraction().getData().getOptions()) {
+                        options.add(option.getValue());
+                    }
+
+                    if(interactionEvent.getInteraction().getType() != InteractionType.APPLICATION_COMMAND) return;
+
+                    client.getCommandRegistry().getSlashCommands().keySet().stream()
+                    .filter(
+                        c -> c.getName().equals(interactionEvent.getInteraction().getData().getName())
+                    ).findFirst()
+                    .orElse(null)
+                    .run(
+                        interactionEvent.getInteraction(),
+                        options.toArray()
+                    );
+                }
+
+                client.getListeners().stream().filter(
+                    l -> l.getEventClass() == event.getClass()
+                ).forEach(l -> l.run(event));
             }
         }
      }

@@ -3,6 +3,7 @@ package io.github.quzacks.maoi;
 import io.github.quzacks.maoi.entity.application.Application;
 import io.github.quzacks.maoi.entity.intent.GatewayIntent;
 import io.github.quzacks.maoi.entity.user.User;
+import io.github.quzacks.maoi.exception.BadRequestException;
 import io.github.quzacks.maoi.gateway.DiscordWebSocket;
 import io.github.quzacks.maoi.entity.user.UserPresence;
 import io.github.quzacks.maoi.events.EventDispatcher;
@@ -93,7 +94,7 @@ public class DiscordClient {
     /**
      * Posts command data to the Discord HTTP API.
      */
-    public void registerCommands() {
+    public void registerCommands() throws BadRequestException {
         for(Map.Entry<SlashCommand, String> entry : commandRegistry.getSlashCommands().entrySet()) {
             final SlashCommand command = entry.getKey();
             final JSONObject data = new JSONObject()

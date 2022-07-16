@@ -1,6 +1,7 @@
 package io.github.quzacks.maoi.http;
 
 import io.github.quzacks.maoi.DiscordClient;
+import io.github.quzacks.maoi.exception.BadRequestException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -63,22 +64,25 @@ public class HttpRequest {
         return this;
     }
 
-    public void execute(DiscordClient discordClient) {
+    public void execute(DiscordClient discordClient) throws BadRequestException {
         final CloseableHttpClient client = HttpClients.createDefault();
 
         switch (type) {
             case POST -> {
                 final StringEntity entity = new StringEntity(json.toString(), ContentType.APPLICATION_JSON);
-                System.out.println(json.toString(2));
                 final HttpPost post = new HttpPost(BASE_API_URL + path);
                 post.setEntity(entity);
 
                 post.setHeader("Authorization", "Bot " + discordClient.getToken());
                 try {
                     final HttpResponse response = client.execute(post);
-                    System.out.println(response.getStatusLine().getStatusCode());
 
-                    assert response.getStatusLine().getStatusCode() == 200;
+                    if(response.getStatusLine().getStatusCode() >= 400) {
+                        throw new BadRequestException(
+                            response.getStatusLine().getReasonPhrase(),
+                            response.getStatusLine().getStatusCode()
+                        );
+                    }
                 } catch(IOException e) {
                     e.printStackTrace();
                 }

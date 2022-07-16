@@ -109,9 +109,9 @@ public class Message {
     /**
      * Message interaction.
      *
-     * @see Interaction
+     * @see MessageInteraction
      */
-    private final Interaction interaction;
+    private final MessageInteraction interaction;
     // TODO: Message components.
     /**
      * Stickers send with the message.
@@ -163,7 +163,7 @@ public class Message {
         }
 
         // TODO: Interaction object.
-        this.interaction = data.isNull("interaction") ? null : new Interaction();
+        this.interaction = data.isNull("interaction") ? null : new MessageInteraction();
 
         if(!data.isNull("sticker_items")) {
             for(int i = 0; i < data.getJSONArray("sticker_items").length(); i++)
@@ -313,9 +313,9 @@ public class Message {
     /**
      * @return Interaction data.
      *
-     * @see Interaction
+     * @see MessageInteraction
      */
-    public Interaction getInteraction() {
+    public MessageInteraction getInteraction() {
         return interaction;
     }
 

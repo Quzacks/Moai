@@ -5,5 +5,6 @@ package io.github.quzacks.maoi.events;
  */
 public enum EventType {
     READY,
-    MESSAGE_CREATE
+    MESSAGE_CREATE,
+    INTERACTION_CREATE
 }
