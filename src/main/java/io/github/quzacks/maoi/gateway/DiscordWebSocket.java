@@ -8,8 +8,10 @@ import io.github.quzacks.maoi.events.GenericEvent;
 import io.github.quzacks.maoi.events.client.ClientReadyEvent;
 import io.github.quzacks.maoi.events.interaction.InteractionCreateEvent;
 import io.github.quzacks.maoi.events.message.MessageCreateEvent;
+import io.github.quzacks.maoi.exception.CommandNotRegisteredException;
 import io.github.quzacks.maoi.interaction.ApplicationCommandOptionData;
 import io.github.quzacks.maoi.interaction.InteractionType;
+import io.github.quzacks.maoi.interaction.slash_command.SlashCommand;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -110,22 +112,11 @@ public class DiscordWebSocket {
                 };
 
                 if(event instanceof InteractionCreateEvent interactionEvent) {
-                    final List<Object> options = new ArrayList<>();
-                    for(ApplicationCommandOptionData option : interactionEvent.getInteraction().getData().getOptions()) {
-                        options.add(option.getValue());
+                    try {
+                        runCommand(interactionEvent);
+                    } catch(CommandNotRegisteredException e) {
+                        e.printStackTrace();
                     }
-
-                    if(interactionEvent.getInteraction().getType() != InteractionType.APPLICATION_COMMAND) return;
-
-                    client.getCommandRegistry().getSlashCommands().keySet().stream()
-                    .filter(
-                        c -> c.getName().equals(interactionEvent.getInteraction().getData().getName())
-                    ).findFirst()
-                    .orElse(null)
-                    .run(
-                        interactionEvent.getInteraction(),
-                        options.toArray()
-                    );
                 }
 
                 client.getListeners().stream().filter(
@@ -133,6 +124,32 @@ public class DiscordWebSocket {
                 ).forEach(l -> l.run(event));
             }
         }
+     }
+
+    /**
+     * Tries to run matched commands.
+     *
+     * @param event Interaction event.
+     *
+     * @throws CommandNotRegisteredException
+     *  If command name does not exist in registered commands list.
+     */
+     private void runCommand(InteractionCreateEvent event) throws CommandNotRegisteredException {
+         final List<Object> options = new ArrayList<>();
+         for(ApplicationCommandOptionData option : event.getInteraction().getData().getOptions()) {
+             options.add(option.getValue());
+         }
+
+         if(event.getInteraction().getType() != InteractionType.APPLICATION_COMMAND) return;
+
+         SlashCommand command = client.getCommandRegistry().getSlashCommands().keySet().stream().filter(
+                 c -> c.getName().equals(event.getInteraction().getData().getName())
+         ).findFirst().orElse(null);
+
+         if(command == null)
+             throw new CommandNotRegisteredException(event.getInteraction().getData().getName());
+
+         command.run(event.getInteraction(), options.toArray());
      }
 
     /**
