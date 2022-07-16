@@ -5,8 +5,6 @@ Not well-made or applicable to actual projects. If you're working on something s
 
 The [`gateway`](src/main/java/io/github/quzacks/maoi/gateway) directory handles the Discord gateway, which is what allows us to listen to events. Gateway intents are required to properly initialise your bot as of [v10](https://discord.com/developers/docs/intro). When you create a client instance, you must specify its intents.
 
-There is no official documentation for the project, and I have no plans to create one.
-
 # Usage
 
 ## Client instance
